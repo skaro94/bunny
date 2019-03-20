@@ -1,3 +1,6 @@
+import os
+import sys
+
 import multiprocessing as mp
 import threading as th
 from tqdm import tqdm
@@ -47,13 +50,40 @@ class TqdmDefaultWriteLock(object):
         self.release()
 
 
+def pad_line(line, max_len):
+    return line + ''.join([' ' for i in range(max_len - len(line))])
+
+
 class bunny(tqdm):
     monitor_interval = 10  # set to 0 to disable the thread
     monitor = None
     _lock = TqdmDefaultWriteLock()
 
-    def __init__(self, iterable, **kwargs):
+    def __init__(self, iterable, name='step', figure='kitten', **kwargs):
+        self.name = name
+        self.figure = {
+            'kitten': 'kitten.txt'
+        }[figure.lower()]
+        self.figure = self.get_figure(self.figure)
+
         super().__init__(iterable, **kwargs)
+
+    @staticmethod
+    def get_figure(filename):
+        path = os.path.abspath(__file__)
+        dir_path = os.path.dirname(path)
+        figure_path = os.path.join(dir_path, filename)
+
+        txt = []
+        with open(figure_path, 'w') as f:
+            for line in f:
+                txt.append(line)
+        # pad to max
+        max_len = max(len(line) for line in txt)
+        for i, line in enumerate(txt):
+            txt[i] = pad_line(line, max_len)
+
+        return txt
 
     def __iter__(self):
         """Backward-compatibility to use: for x in tqdm(iterable)"""
@@ -149,14 +179,9 @@ Please use `tqdm_gui(...)` instead of `tqdm(..., gui=True)`
                     offset = " " * int(n / self.total * (self.ncols - 40))
                 else:
                     offset = ""
-                tqdm.write(offset + '|￣￣￣￣￣￣￣￣|')
-                tqdm.write(offset + '|    TRAINING    |') 
-                tqdm.write(offset + '|     epoch      |')
-                tqdm.write(offset + f'|   {obj:>6}       |')  
-                tqdm.write(offset + '| ＿＿＿_＿＿＿＿|') 
-                tqdm.write(offset + ' (\__/) ||') 
-                tqdm.write(offset + ' (•ㅅ•) || ')
-                tqdm.write(offset + ' / 　 づ')
+                tqdm.write(offset + f'[{obj:>6} {self.name}]')
+                for line in self.figure:
+                    tqdm.write(offset + line)
 
             # Closing the progress bar.
             # Update some internal variables for close().
