@@ -2,8 +2,6 @@
 
 ![bunny training](bunny.gif)
 
-https://twitter.com/tkasasagi/status/1045582451769192449
-
 # Usage:
 
 ```Python
@@ -23,5 +21,5 @@ for epoch in bunny(epochs):  # use bunny like tqdm
 # Installation
 
 ```
-pip install git+git://github.com/bheinzerling/bunny
+pip install git+git://github.com/skaro94/bunny
 ```
