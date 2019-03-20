@@ -75,9 +75,9 @@ class bunny(tqdm):
         figure_path = os.path.join(dir_path, filename)
 
         txt = []
-        with open(figure_path, 'w') as f:
+        with open(figure_path, 'r') as f:
             for line in f:
-                txt.append(line)
+                txt.append(line[:-1])  # remove \n
         # pad to max
         max_len = max(len(line) for line in txt)
         for i, line in enumerate(txt):
@@ -173,7 +173,7 @@ Please use `tqdm_gui(...)` instead of `tqdm(..., gui=True)`
                         self.last_print_t = last_print_t = cur_t
                         self.miniters = miniters
 
-                tqdm.write(up * 9)  # move cursor up
+                tqdm.write(up * (len(self.figure) + 2))  # move cursor up
                 if self.total:
                     # move bunny
                     offset = " " * int(n / self.total * (self.ncols - 40))
